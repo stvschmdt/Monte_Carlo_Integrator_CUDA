@@ -1,0 +1,32 @@
+steveschmidt
+hw4
+
+*****************
+**Code Comments**
+*****************
+
+1. Simpson OMP
+
+This was pretty straightforward, after of course realizing the 10 loops needed for the 5 dimensions. As far as parallizing the code, again, OMP was simple to try a couple strategies. Mainly, one loop or two and the speedup was nominal over serial. One reason was that Simpsons converges after 3 iterations for this particular function. However, looking at the timing for larger n, it was quickly seen that there was not only an exponential increase in computations n^5 as n increase, but even with 32 threads, this was correlated strictly to the n. Along with the cnvergence, simpson's with OMP was teh quickest to get under my error threshold of .001%. 
+
+2. Monte Carlo OMP
+
+Probably the most interesting result - no from a HPC standpoint but in general, that MC converged quickly timing wise, but accuracy wise. That was pretty remarkable. Anyway I was able to get pretty decent convergence at at around the 5,000,000 mark for N. I used two methods as are commented out in the code, one was to use srand/rand the other to use the rn function with an offset. Both produced similar results at the end of the day, There was a little variance in iterations to convergence, but washed out as n increased. One of the error charts nicely shows the convergence as N went from say 10000 to 10000000. Just to see the extreme, hard to see on the graph, but running this with n at like 100 - 1000 you see incredible change in error as it goes from nowhere close, to in the ballpark pretty quickly. This method was the slowest of the bunch, reaching 72+ seconds for 50000000 iterations with 32 threads.
+
+*** for both MC's the timings were started prior to random number generation ***
+
+3. Simpson CUDA
+
+This was extremely difficult for me after I couldn't wrap my mind around a method to map the function over. As I explained I had a map which is defined again below, but I could not implement it. Sucked. In the end I went with a method to pass a set of arrays representing the loops verse looping on the device. This ran into problems at run time with my assert coming back from the device - and in the end never ran properly therefore I did not include the timing comparisons with the others. I feel like I made an error in the kernel function call arguments, but could not solve it.
+
+
+4. Monte Carlo CUDA
+
+This implementation was similar to the dotp implementation whereby threadix is used to do a single calculation on an array. For this I used the method of passing an array of random values for x, y, z, u, v onto the device. Convergence was similar to OMP obviously but incredibly faster. With only one kernel call this was a good strategy for up to 1000000 n values which was enough to converge a good portion of the time. After 1000000, there were memory issues on the device.
+
+ATTACHMENTS:
+8 charts
+Error vs. N for all methods
+Time vs. N for all methods
+All comparison for minimum error tolerance
+Thread timing comparison for OMP
